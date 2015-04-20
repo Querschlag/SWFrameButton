@@ -37,7 +37,7 @@
     SWFrameButton *button = [[SWFrameButton alloc] init];
     [button setTitle:@"Selected Button" forState:UIControlStateNormal];
     [button sizeToFit];
-    button.center = self.view.center;
+    button.center = CGPointMake(self.view.center.x, self.view.center.y + 75);
     [button setSelected:YES];
     [self.view addSubview:button];
     
@@ -45,14 +45,14 @@
     [selectableButton setTitle:@"Selectable Button" forState:UIControlStateNormal];
     [selectableButton addTarget:self action:@selector(toggleSelection:) forControlEvents:UIControlEventTouchUpInside];
     [selectableButton sizeToFit];
-    selectableButton.center = CGPointMake(self.view.center.x, self.view.center.y + 50);
+    selectableButton.center = CGPointMake(self.view.center.x, self.view.center.y + 125);
     [self.view addSubview:selectableButton];
     
     SWFrameButton *tintButton = [[SWFrameButton alloc] init];
     [tintButton setTitle:@"Green Tint Button" forState:UIControlStateNormal];
     [tintButton sizeToFit];
     tintButton.tintColor = [UIColor greenColor];
-    tintButton.center = CGPointMake(self.view.center.x, self.view.center.y + 100);
+    tintButton.center = CGPointMake(self.view.center.x, self.view.center.y + 175);
     
     [self.view addSubview:tintButton];
     
@@ -61,13 +61,13 @@
     [dimButton addTarget:self action:@selector(toggleDim:) forControlEvents:UIControlEventTouchUpInside];
     [dimButton sizeToFit];
     dimButton.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
-    dimButton.center = CGPointMake(self.view.center.x, self.view.center.y + 150);
+    dimButton.center = CGPointMake(self.view.center.x, self.view.center.y + 225);
     [self.view addSubview:dimButton];
     
     UIButton *systemButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [systemButton setTitle:@"System Button" forState:UIControlStateNormal];
     [systemButton sizeToFit];
-    systemButton.center = CGPointMake(self.view.center.x, self.view.center.y + 200);
+    systemButton.center = CGPointMake(self.view.center.x, self.view.center.y + 260);
     [self.view addSubview:systemButton];
 }
 

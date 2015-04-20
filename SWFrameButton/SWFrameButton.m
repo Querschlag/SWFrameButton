@@ -128,6 +128,16 @@ static UIEdgeInsets const SWContentEdgeInsets = {5, 10, 5, 10};
     }
 }
 
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+
+    if (enabled) {
+        self.tintAdjustmentMode = UIViewTintAdjustmentModeAutomatic;
+    } else {
+        self.tintAdjustmentMode = UIViewTintAdjustmentModeDimmed;
+    }
+}
+
 - (void)tintColorDidChange
 {
     self.layer.borderColor = self.tintColor.CGColor;
@@ -162,6 +172,54 @@ static UIEdgeInsets const SWContentEdgeInsets = {5, 10, 5, 10};
 }
 
 #pragma mark - helper
+
+// from https://github.com/ddelruss/UIColor-Mixing
++ (UIColor*)rgbMixForColors:(NSArray*)arrayOfColors {
+    UIColor *resultColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:1];
+
+    CGFloat c1, c2, c3, c1Total, c2Total, c3Total, notUsed; //
+    NSInteger count = [arrayOfColors count];
+
+    if (count == 0) return resultColor;
+    if (count == 1) return [[arrayOfColors lastObject] copy];
+
+    c1Total = c2Total = c3Total = 0;
+
+    for (UIColor* aColor in arrayOfColors) {
+        [aColor getRed:&c1 green:&c2 blue:&c3 alpha:&notUsed];
+
+        c1Total += c1;
+        c2Total += c2;
+        c3Total += c3;
+    }
+
+    c1 = c1Total/count;
+    c2 = c2Total/count;
+    c3 = c3Total/count;
+
+    resultColor = [UIColor colorWithRed:c1 green:c2 blue:c3 alpha:1.0];
+
+    return resultColor;
+}
+
++ (BOOL)isVisibleColor:(UIColor *)color {
+    CGFloat r,g,b,a;
+    [color getRed:&r green:&g blue:&b alpha:&a];
+    if (a > 0) {
+        return YES;
+    }
+    return NO;
+}
+
++ (BOOL)isSolidColor:(UIColor *)color {
+    CGFloat r,g,b,a;
+    [color getRed:&r green:&g blue:&b alpha:&a];
+    if (a >= 1) {
+        return YES;
+    }
+    return NO;
+}
+
 /**
  *  Get current background color
  *
@@ -169,14 +227,28 @@ static UIEdgeInsets const SWContentEdgeInsets = {5, 10, 5, 10};
  */
 - (UIColor *)currentBackgroundColor
 {
-    UIColor *backgroundColor = self.superview.backgroundColor;
-    UIView *superSuperView = self.superview.superview;
-    
-    while (backgroundColor == nil && superSuperView != nil) {
+    UIColor *backgroundColor = nil;
+    UIView *superSuperView = self.superview;
+    NSMutableArray *colorsWithAlpha = [NSMutableArray new];
+    BOOL foundSolidColor = NO;
+
+    while (!foundSolidColor && superSuperView != nil) {
         backgroundColor = superSuperView.backgroundColor;
         superSuperView = superSuperView.superview;
+
+        if (backgroundColor != nil) {
+            if ([SWFrameButton isSolidColor:backgroundColor] && colorsWithAlpha.count == 0) {
+                colorsWithAlpha = [NSMutableArray arrayWithObject:backgroundColor];
+                foundSolidColor = YES;
+            } else {
+                if ([SWFrameButton isVisibleColor:backgroundColor]) {
+                    [colorsWithAlpha addObject:backgroundColor];
+                }
+            }
+        }
     }
-    
+
+    backgroundColor = [SWFrameButton rgbMixForColors:colorsWithAlpha];
     return backgroundColor;
 }
 
